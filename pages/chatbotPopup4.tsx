@@ -1,8 +1,9 @@
-// components/ChatbotPopup4.tsx
 import React, { FunctionComponent, useState } from 'react';
+import axios from 'axios';
+import { useRouter } from 'next/router';
 import Image from 'next/image';
-import Link from 'next/link';
 import x from '../public/x.png';
+import { useQuiz } from './QuizContext';
 
 interface ChatbotPopup4Props {
   onClose: () => void;
@@ -10,10 +11,28 @@ interface ChatbotPopup4Props {
 
 const ChatbotPopup4: FunctionComponent<ChatbotPopup4Props> = ({ onClose }) => {
   const [isOpen, setIsOpen] = useState(true);
+  const { language, setLanguage, pdfType, theme, numberOfQuestions } = useQuiz();
+  const router = useRouter();
 
   const handleCloseChat = (): void => {
     setIsOpen(false);
     onClose();
+  };
+
+  const handleSelectChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    setLanguage(event.target.value);
+  };
+
+  const handleNextClick = () => {
+    const data = { pdfType, theme, numberOfQuestions, language };
+    axios.post('http://127.0.0.1:5000/api/submit', data)
+      .then(response => {
+        console.log('Data sent successfully:', response.data);
+        router.push('/quizPage');
+      })
+      .catch(error => {
+        console.error('There was an error sending the data:', error);
+      });
   };
 
   return isOpen ? (
@@ -34,18 +53,21 @@ const ChatbotPopup4: FunctionComponent<ChatbotPopup4Props> = ({ onClose }) => {
             La langue du quiz
           </p>
           <div className="h-14 flex flex-col mt-10 rounded-b-2xl">
-            <select className="px-4 py-2 m-3 text-base text-slate-950 bg-slate-50 rounded-xl mr-4">
+            <select
+              className="px-4 py-2 m-3 text-base text-slate-950 bg-slate-50 rounded-xl mr-4"
+              value={language}
+              onChange={handleSelectChange}
+            >
               <option value="Français">Français</option>
               <option value="Anglais">Anglais</option>
               <option value="Arabe">Arabe</option>
             </select>
-            <Link href="/quizPage">
-              <button
-                className="px-4 py-2 m-3 text-base text-slate-200 bg-blue-800 rounded-xl mr-4"
-              >
-                Next
-              </button>
-            </Link>
+            <button
+              className="px-4 py-2 m-3 text-base text-slate-200 bg-blue-800 rounded-xl mr-4"
+              onClick={handleNextClick}
+            >
+              Next
+            </button>
           </div>
         </div>
       </div>

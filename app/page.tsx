@@ -1,11 +1,12 @@
 import Image from "next/image";
 // import Main from "./main";
 import ChatBot from "../pages/Chatbot";
+import { QuizProvider } from '../pages/QuizContext';
 
 export default function Home() {
   return (
-    <main className="">
+    <QuizProvider className="">
       <ChatBot></ChatBot>
-    </main>
+    </QuizProvider>
   );
 }
